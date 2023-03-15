@@ -53,6 +53,10 @@ void icm20948_init()
 
 	icm20948_gyro_full_scale_select(_2000dps);
 	icm20948_accel_full_scale_select(_16g);
+
+	icm20948_data_ready_int_enable(1);
+
+
 }
 
 void ak09916_init()
@@ -82,8 +86,21 @@ void icm20948_accel_read(axises* data)
 
 	data->x = (int16_t)(temp[0] << 8 | temp[1]);
 	data->y = (int16_t)(temp[2] << 8 | temp[3]);
-	data->z = (int16_t)(temp[4] << 8 | temp[5]) + accel_scale_factor; 
+	data->z = (int16_t)(temp[4] << 8 | temp[5]);// + accel_scale_factor;
 	// Add scale factor because calibraiton function offset gravity acceleration.
+}
+
+void icm20948_accel_gyro_read (axisesAll* data)
+{
+  uint8_t *temp = read_multiple_icm20948_reg (ub_0, B0_ACCEL_XOUT_H, 14);
+
+  data->ax = (int16_t) (temp[0] << 8 | temp[1]);
+  data->ay = (int16_t) (temp[2] << 8 | temp[3]);
+  data->az = (int16_t) (temp[4] << 8 | temp[5]);	// + accel_scale_factor;
+
+  data->gx = (int16_t) (temp[8] << 8 | temp[9]);
+  data->gy = (int16_t) (temp[10] << 8 | temp[11]);
+  data->gz = (int16_t) (temp[12] << 8 | temp[13]);
 }
 
 bool ak09916_mag_read(axises* data)
@@ -254,6 +271,11 @@ void icm20948_accel_low_pass_filter(uint8_t config)
 void icm20948_gyro_sample_rate_divider(uint8_t divider)
 {
 	write_single_icm20948_reg(ub_2, B2_GYRO_SMPLRT_DIV, divider);
+}
+
+void icm20948_data_ready_int_enable(uint8_t divider)
+{
+  write_single_icm20948_reg(ub_0,B0_INT_ENABLE_1 , divider);
 }
 
 void icm20948_accel_sample_rate_divider(uint16_t divider)

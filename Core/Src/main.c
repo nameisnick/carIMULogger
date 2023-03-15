@@ -28,6 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "icm209482.h"
+#include "cQueue.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,11 +64,13 @@ typedef struct{
 //extern int16_t gyro_data[3];
 
 volatile uint8_t userKey1Flag = 0;
-
+volatile uint8_t dataReadyFlag = 0;
+volatile int dataReadyCount = 0;
 
 axises my_gyro;
 axises my_accel;
 axises my_mag;
+axisesAll accel_gyro_data;
 
 /* USER CODE END PV */
 
@@ -86,6 +90,15 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
   if (GPIO_Pin == GPIO_PIN_4)
   {
     userKey1Flag = 1;
+
+  }
+
+  if (GPIO_Pin == GPIO_PIN_15)
+  {
+    dataReadyCount++;
+    dataReadyFlag = 0;
+    icm20948_accel_gyro_read(&accel_gyro_data);
+
   }
 }
 /* USER CODE END PFP */
@@ -200,8 +213,7 @@ int main(void)
 //      ICM_ReadMag (mag_data);
       // Print raw, but joined, axis data values to screen
 
-      icm20948_gyro_read(&my_gyro);
-      icm20948_accel_read(&my_accel);
+
       ak09916_mag_read(&my_mag);
 
 //      sprintf (uart_buffer, "%10d,%5d,%5d,%5d,%5d,%5d,%5d,%5d,%5d,%5d\r\n",

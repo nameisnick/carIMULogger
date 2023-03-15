@@ -58,6 +58,16 @@ typedef struct
 	int16_t z;
 } axises;
 
+typedef struct
+{
+  int16_t ax;
+  int16_t ay;
+  int16_t az;
+  int16_t gx;
+  int16_t gy;
+  int16_t gz;
+} axisesAll;
+
 typedef enum
 {
 	power_down_mode = 0,
@@ -79,6 +89,7 @@ void ak09916_init();
 // 16 bits ADC value. raw data.
 void icm20948_gyro_read(axises* data);	
 void icm20948_accel_read(axises* data);
+void icm20948_accel_gyro_read (axisesAll* data);
 bool ak09916_mag_read(axises* data); 
 
 // Convert 16 bits ADC value to their unit.
@@ -113,6 +124,7 @@ void icm20948_accel_low_pass_filter(uint8_t config); // 0 - 7
 void icm20948_gyro_sample_rate_divider(uint8_t divider);
 void icm20948_accel_sample_rate_divider(uint16_t divider);
 void ak09916_operation_mode_setting(operation_mode mode);
+void icm20948_data_ready_int_enable(uint8_t divider);
 
 // Calibration before select full scale.
 void icm20948_gyro_calibration();

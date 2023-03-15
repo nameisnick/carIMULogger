@@ -1,0 +1,5 @@
+../Core/Src/cQueue.c:10:12:createCQueue	16	static
+../Core/Src/cQueue.c:16:5:isCQueueEmpty	16	static
+../Core/Src/cQueue.c:24:5:isCQueueFull	16	static
+../Core/Src/cQueue.c:32:6:enCQueue	24	static
+../Core/Src/cQueue.c:37:9:deCQueue	16	static
