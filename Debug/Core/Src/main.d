@@ -45,8 +45,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Middlewares/Third_Party/FatFs/src/ff.h ../FATFS/Target/sd_diskio.h \
  ../Core/Inc/sdmmc.h ../Core/Inc/main.h ../Core/Inc/spi.h \
  ../Core/Inc/tim.h ../Core/Inc/usart.h ../Core/Inc/gpio.h \
- ../Core/Inc/icm209482.h ../Core/Inc/spi.h ../Core/Inc/cQueue.h \
- ../Core/Inc/icm209482.h
+ ../Core/Inc/icm20948.h ../Core/Inc/spi.h ../Core/Inc/cQueue.h \
+ ../Core/Inc/icm20948.h
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 ../Core/Inc/stm32h7xx_hal_conf.h:
@@ -101,7 +101,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/tim.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/gpio.h:
-../Core/Inc/icm209482.h:
+../Core/Inc/icm20948.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/cQueue.h:
-../Core/Inc/icm209482.h:
+../Core/Inc/icm20948.h:

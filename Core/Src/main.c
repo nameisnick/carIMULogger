@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "fatfs.h"
 #include "sdmmc.h"
 #include "spi.h"
@@ -27,25 +28,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "icm209482.h"
+#include "icm20948.h"
 #include "cQueue.h"
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typedef struct{
-  int32_t time;
-  int16_t ax;
-  int16_t ay;
-  int16_t az;
-  int16_t gx;
-  int16_t gy;
-  int16_t gz;
-  int16_t mx;
-  int16_t my;
-  int16_t mz;
-}IMU;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -70,8 +60,10 @@ volatile int dataReadyCount = 0;
 axises my_gyro;
 axises my_accel;
 axises my_mag;
-axisesAll accel_gyro_data;
+int16_t mag_data[3];
+IMU imuData;
 
+QueueType* cQ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,8 +89,8 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
   {
     dataReadyCount++;
     dataReadyFlag = 0;
-    icm20948_accel_gyro_read(&accel_gyro_data);
-
+    icm20948_accel_gyro_read(&imuData);
+    if(!isCQueueFull(cQ)) enCQueue(cQ, imuData);
   }
 }
 /* USER CODE END PFP */
@@ -116,6 +108,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   char uart_buffer[100];
+  cQ = createCQueue();
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -139,26 +132,27 @@ int main(void)
   MX_SDMMC1_SD_Init();
   MX_UART4_Init();
   MX_SPI2_Init();
-  MX_FATFS_Init();
+  MX_DMA_Init();
   MX_TIM7_Init();
+  MX_FATFS_Init();
   /* USER CODE BEGIN 2 */
+
   printf ("start main()\r\n");
 
-//  ICM_SelectBank (USER_BANK_0);
   HAL_Delay (10);
   icm20948_init();
-//  ICM_PowerOn ();
   ak09916_init();
   HAL_Delay (10);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
   char fileName[12];
 
   HAL_GPIO_WritePin (LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
   int i = 0;
-  BYTE buf[32] = "Hello world\r\n"; // file copy buffer
   uint32_t bw, br;
 
   // 1.
@@ -178,9 +172,8 @@ int main(void)
 
   do
   {
-
     fileIndex++;
-    sprintf (fileName, "data%04d.dat", fileIndex);
+    sprintf (fileName, "data%04d.bin", fileIndex);
 
     retSD = f_open (&SDFile, fileName, FA_OPEN_EXISTING | FA_READ);
     HAL_UART_Transmit (&huart4, fileName, 12, HAL_MAX_DELAY);
@@ -197,24 +190,19 @@ int main(void)
   uint8_t startFlag = 0;
   uint8_t save_Count = 0;
 
-  IMU imuData;
+
   while (1)
   {
     if (startFlag)
     {
-//      ICM_SelectBank (USER_BANK_0);
-      HAL_Delay (10);
+      //ICM_SelectBank(USER_BANK_0);
+      //ICM_ReadAccelGyro();
 
-      // Obtain accelerometer and gyro data
-//      ICM_ReadAccelGyro ();
-
-      // Obtain magnetometer data
-      int16_t mag_data[3];
-//      ICM_ReadMag (mag_data);
+      //ICM_ReadMag(mag_data);
       // Print raw, but joined, axis data values to screen
 
 
-      ak09916_mag_read(&my_mag);
+      ///ak09916_mag_read(&imuData);
 
 //      sprintf (uart_buffer, "%10d,%5d,%5d,%5d,%5d,%5d,%5d,%5d,%5d,%5d\r\n",
 //               HAL_GetTick(),accel_data[0], accel_data[1], accel_data[2], gyro_data[0],
@@ -225,32 +213,41 @@ int main(void)
 //               my_gyro.y, my_gyro.z, my_mag.x, my_mag.y,
 //               my_mag.z);
 
-      imuData.time = HAL_GetTick();
-      imuData.ax = my_accel.x;
-      imuData.ax = my_accel.y;
-      imuData.ax = my_accel.z;
-
-      imuData.gx = my_gyro.x;
-      imuData.gx = my_gyro.y;
-      imuData.gx = my_gyro.z;
-
-      imuData.ax = my_mag.x;
-      imuData.ax = my_mag.y;
-      imuData.ax = my_mag.z;
+//      imuData.time = HAL_GetTick();
+//      imuData.ax = my_accel.x;
+//      imuData.ax = my_accel.y;
+//      imuData.ax = my_accel.z;
+//
+//      imuData.gx = my_gyro.x;
+//      imuData.gx = my_gyro.y;
+//      imuData.gx = my_gyro.z;
+//
+//      imuData.ax = my_mag.x;
+//      imuData.ax = my_mag.y;
+//      imuData.ax = my_mag.z;
 
       //HAL_UART_Transmit(&huart4, (uint8_t*) uart_buffer, strlen(uart_buffer), 1000);
       //printf("%d\r\n", strlen(uart_buffer));
+
+
       f_write (&SDFile,  (uint8_t*)&imuData, 22 , &bw);
       if(save_Count++ == 5){
         save_Count = 0;
         f_sync (&SDFile);
       }
+      if( dataReadyCount%500 == 0){
+        HAL_GPIO_TogglePin (LED_B_GPIO_Port, LED_B_Pin);
+      }
+
     }
 
     if (userKey1Flag)
     {
-      if (startFlag == 1)
+      if (startFlag == 1){
         f_close (&SDFile);
+        fileIndex++;
+        sprintf (fileName, "data%04d.bin", fileIndex);
+      }
       else
       {
         retSD = f_open (&SDFile, fileName, FA_OPEN_APPEND | FA_WRITE);
@@ -266,10 +263,14 @@ int main(void)
       }
 
       printf ("asdf\r\n");
-
+      if(startFlag){
+        HAL_GPIO_WritePin (LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
+      }else{
+        HAL_GPIO_WritePin (LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_SET);
+      }
       startFlag = !startFlag;
       HAL_Delay (500);
-      HAL_GPIO_TogglePin (LED_B_GPIO_Port, LED_B_Pin);
+
       userKey1Flag = 0;
     }
 

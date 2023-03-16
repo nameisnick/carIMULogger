@@ -1,4 +1,4 @@
-Core/Src/icm209482.o: ../Core/Src/icm209482.c ../Core/Inc/icm209482.h \
+Core/Src/icm20948.o: ../Core/Src/icm20948.c ../Core/Inc/icm20948.h \
  ../Core/Inc/spi.h ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
@@ -38,7 +38,7 @@ Core/Src/icm209482.o: ../Core/Src/icm209482.c ../Core/Inc/icm209482.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
-../Core/Inc/icm209482.h:
+../Core/Inc/icm20948.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:

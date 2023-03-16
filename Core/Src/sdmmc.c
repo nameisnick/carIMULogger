@@ -68,7 +68,7 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     PeriphClkInitStruct.PLL2.PLL2N = 192;
     PeriphClkInitStruct.PLL2.PLL2P = 2;
     PeriphClkInitStruct.PLL2.PLL2Q = 2;
-    PeriphClkInitStruct.PLL2.PLL2R = 20;
+    PeriphClkInitStruct.PLL2.PLL2R = 10;
     PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_2;
     PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
     PeriphClkInitStruct.PLL2.PLL2FRACN = 0;

@@ -1,6 +1,6 @@
 "./Core/Src/cQueue.o"
 "./Core/Src/gpio.o"
-"./Core/Src/icm209482.o"
+"./Core/Src/icm20948.o"
 "./Core/Src/main.o"
 "./Core/Src/sdmmc.o"
 "./Core/Src/spi.o"

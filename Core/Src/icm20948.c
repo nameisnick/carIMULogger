@@ -6,7 +6,7 @@
 */
 
 
-#include "icm209482.h"
+#include "icm20948.h"
 
 
 static float gyro_scale_factor;
@@ -45,8 +45,8 @@ void icm20948_init()
 	icm20948_gyro_low_pass_filter(0);
 	icm20948_accel_low_pass_filter(0);
 
-	icm20948_gyro_sample_rate_divider(0);
-	icm20948_accel_sample_rate_divider(0);
+	icm20948_gyro_sample_rate_divider(0x03);
+	icm20948_accel_sample_rate_divider(0x03);
 
 	icm20948_gyro_calibration();
 	icm20948_accel_calibration();
@@ -90,20 +90,20 @@ void icm20948_accel_read(axises* data)
 	// Add scale factor because calibraiton function offset gravity acceleration.
 }
 
-void icm20948_accel_gyro_read (axisesAll* data)
+void icm20948_accel_gyro_read (IMU* data)
 {
   uint8_t *temp = read_multiple_icm20948_reg (ub_0, B0_ACCEL_XOUT_H, 14);
 
-  data->ax = (int16_t) (temp[0] << 8 | temp[1]);
-  data->ay = (int16_t) (temp[2] << 8 | temp[3]);
-  data->az = (int16_t) (temp[4] << 8 | temp[5]);	// + accel_scale_factor;
-
-  data->gx = (int16_t) (temp[8] << 8 | temp[9]);
-  data->gy = (int16_t) (temp[10] << 8 | temp[11]);
-  data->gz = (int16_t) (temp[12] << 8 | temp[13]);
+  data->accel_x = (int16_t) (temp[0] << 8 | temp[1]);
+  data->accel_y = (int16_t) (temp[2] << 8 | temp[3]);
+  data->accel_z = (int16_t) (temp[4] << 8 | temp[5]);	// + accel_scale_factor;
+  data->temp    = (int16_t) (temp[6] << 8 | temp[7]);
+  data->gyro_x  = (int16_t) (temp[8] << 8 | temp[9]);
+  data->gyro_y  = (int16_t) (temp[10] << 8 | temp[11]);
+  data->gyro_z  = (int16_t) (temp[12] << 8 | temp[13]);
 }
 
-bool ak09916_mag_read(axises* data)
+bool ak09916_mag_read(IMU* data)
 {
 	uint8_t* temp;
 	uint8_t drdy, hofl;	// data ready, overflow
@@ -116,9 +116,9 @@ bool ak09916_mag_read(axises* data)
 	hofl = read_single_ak09916_reg(MAG_ST2) & 0x08;
 	if(hofl)	return false;
 
-	data->x = (int16_t)(temp[1] << 8 | temp[0]);
-	data->y = (int16_t)(temp[3] << 8 | temp[2]);
-	data->z = (int16_t)(temp[5] << 8 | temp[4]);
+	data->mag_x = (int16_t)(temp[1] << 8 | temp[0]);
+	data->mag_y = (int16_t)(temp[3] << 8 | temp[2]);
+	data->mag_z = (int16_t)(temp[5] << 8 | temp[4]);
 
 	return true;
 }

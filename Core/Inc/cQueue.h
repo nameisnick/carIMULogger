@@ -8,11 +8,11 @@
 #ifndef INC_CQUEUE_H_
 #define INC_CQUEUE_H_
 
-#include "icm209482.h"
+#include "icm20948.h"
 
 #define CQUEUE_SIZE 20
 
-typedef axisesAll element;
+typedef IMU element;
 
 typedef struct{
   element cQueue[CQUEUE_SIZE];
