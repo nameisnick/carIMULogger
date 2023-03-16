@@ -76,8 +76,7 @@ void SystemClock_Config(void);
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif /* __GNUC__ */
 
-void
-HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == GPIO_PIN_4)
   {
@@ -93,6 +92,12 @@ HAL_GPIO_EXTI_Callback (uint16_t GPIO_Pin)
     if(!isCQueueFull(cQ)) enCQueue(cQ, imuData);
   }
 }
+
+int isSDcard(){
+  return HAL_GPIO_ReadPin(SD_CD_GPIO_Port, SD_CD_Pin);
+}
+
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
